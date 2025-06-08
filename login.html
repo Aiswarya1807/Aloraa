@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - ALORAA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f9f6fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-box {
+      max-width: 400px;
+      width: 100%;
+      padding: 30px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .btn-primary {
+      background-color: #7c1b8d;
+      border-color: #7c1b8d;
+    }
+    .btn-primary:hover {
+      background-color: #6a157a;
+      border-color: #6a157a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <h3 class="text-center mb-4 text-dark">Login to ALORAA</h3>
+
+  <!-- Message display -->
+  <div id="loginMessage" class="mb-3"></div>
+
+  <form id="loginForm">
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" required />
+    </div>
+    <div class="d-grid">
+      <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+    <div class="text-center mt-3">
+      <small>Don't have an account? <a href="register.html">Register here</a></small>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = btoa(document.getElementById("password").value); // Encode password
+    const messageDiv = document.getElementById("loginMessage");
+
+    const users = JSON.parse(localStorage.getItem("beautyshopUsers")) || [];
+
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      messageDiv.innerHTML = '<div class="alert alert-success">Login successful! Redirecting...</div>';
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1500);
+    } else {
+      messageDiv.innerHTML = '<div class="alert alert-danger">Invalid email or password.</div>';
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
