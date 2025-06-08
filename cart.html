@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shopping Cart - ALORAA</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-color: #f9f6fc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar {
+      background-color: #7c1b8d;
+    }
+    footer {
+      background-color: #bf94c9;
+    }
+    .text-primary {
+      color: #7c1b8d !important;
+    }
+    .cart-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .cart-card {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      background-color: #fff;
+    }
+    .cart-image {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-right: 20px;
+      flex-shrink: 0;
+    }
+    .cart-details {
+      flex-grow: 1;
+    }
+    .cart-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .cart-price, .cart-quantity, .cart-subtotal {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .cart-quantity, .cart-subtotal {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .remove-btn {
+      flex-shrink: 0;
+      align-self: center;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    #cart-total {
+      max-width: 800px;
+      margin: 20px auto 10px auto;
+      text-align: right;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #7c1b8d;
+    }
+    #checkout-section {
+      max-width: 800px;
+      margin: 0 auto 40px auto;
+      text-align: right;
+    }
+    /* Quantity buttons */
+    .quantity-btn {
+      user-select: none;
+      width: 28px;
+      height: 28px;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      padding: 0;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .cart-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .cart-image {
+        margin-bottom: 15px;
+      }
+      #cart-total, #checkout-section {
+        text-align: left;
+      }
+      .remove-btn {
+        align-self: flex-start;
+        margin-top: 10px;
+      }
+      .cart-quantity {
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark shadow">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">ALORAA</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link text-light" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="skincare.html">Skincare</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="haircare.html">Haircare</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="makeup.html">Makeup</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="cart.html">Cart</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Cart Section -->
+  <div class="container cart-container py-5">
+    <h2 class="mb-4 text-primary">Your Cart</h2>
+    <div id="cart-container"></div>
+    <div id="cart-total"></div>
+    <div id="checkout-section">
+      <button id="place-order-btn" class="btn btn-lg" style="background-color: #7c1b8d; color: white;">Proceed to Pay</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 text-muted">
+    &copy; 2025 ALORAA. All rights reserved.
+  </footer>
+
+  <!-- Cart JS -->
+  <script>
+    function formatPrice(num) {
+      return num.toLocaleString('en-IN', { style: 'currency', currency: 'INR' });
+    }
+
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const container = document.getElementById('cart-container');
+      container.innerHTML = '';
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p>Your cart is empty.</p>';
+        document.getElementById('cart-total').textContent = '';
+        return;
+      }
+
+      let total = 0;
+
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        const itemHTML = `
+          <div class="cart-card">
+            <img src="${item.image}" alt="${item.title}" class="cart-image" />
+            <div class="cart-details">
+              <div class="cart-title">${item.title}</div>
+              <div class="cart-price">Price: <span class="text-primary">${formatPrice(item.price)}</span></div>
+              <div class="cart-quantity">
+                Quantity: 
+                <button class="btn btn-outline-secondary btn-sm quantity-btn decrement" data-title="${item.title}">−</button>
+                <span class="mx-2 fw-bold">${item.quantity}</span>
+                <button class="btn btn-outline-secondary btn-sm quantity-btn increment" data-title="${item.title}">+</button>
+              </div>
+              <div class="cart-subtotal">Subtotal: <span class="text-primary">${formatPrice(itemTotal)}</span></div>
+            </div>
+            <button class="btn btn-danger remove-btn" data-title="${item.title}">Remove</button>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', itemHTML);
+      });
+
+      document.getElementById('cart-total').textContent = `Total: ${formatPrice(total)}`;
+
+      // Remove button event listeners
+      document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const titleToRemove = button.getAttribute('data-title');
+          let cart = JSON.parse(localStorage.getItem('cart')) || [];
+          cart = cart.filter(item => item.title !== titleToRemove);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          renderCart();
+        });
+      });
+
+      // Quantity buttons event listeners
+      document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const title = button.getAttribute('data-title');
+          let cart = JSON.parse(localStorage.getItem('cart')) || [];
+          const productIndex = cart.findIndex(item => item.title === title);
+          if (productIndex > -1) {
+            if (button.classList.contains('increment')) {
+              cart[productIndex].quantity += 1;
+            } else if (button.classList.contains('decrement')) {
+              if (cart[productIndex].quantity > 1) {
+                cart[productIndex].quantity -= 1;
+              } else {
+                cart.splice(productIndex, 1);
+              }
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+          }
+        });
+      });
+    }
+
+    function placeOrder() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart.length === 0) {
+        alert('Your cart is empty. Please add items before proceeding to pay.');
+        return;
+      }
+      window.location.href = 'checkout.html';
+    }
+
+    // Initial render
+    renderCart();
+
+    // Attach placeOrder to button
+    document.getElementById('place-order-btn').addEventListener('click', placeOrder);
+  </script>
+
+  <!-- Bootstrap JS Bundle (for navbar toggler) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
